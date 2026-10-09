@@ -89,8 +89,10 @@ class _MenuScreenState extends State<MenuScreen> {
 
   void _share() {
     SharePlus.instance.share(
-      'I\'m blasting through the galaxy in Star Blaster! 🚀\n'
-      'https://play.google.com/store/apps/details?id=com.gameswajiha.starblaster',
+      ShareParams(
+        text: 'I\'m blasting through the galaxy in Star Blaster! 🚀\n'
+            'https://play.google.com/store/apps/details?id=com.gameswajiha.starblaster',
+      ),
     );
   }
 

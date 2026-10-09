@@ -190,8 +190,10 @@ class _GameScreenState extends State<GameScreen>
 
   void _shareScore() {
     SharePlus.instance.share(
-      'I scored ${_e.score} in Star Blaster! 🚀 Can you beat me?\n'
-      'https://play.google.com/store/apps/details?id=com.gameswajiha.starblaster',
+      ShareParams(
+        text: 'I scored ${_e.score} in Star Blaster! 🚀 Can you beat me?\n'
+            'https://play.google.com/store/apps/details?id=com.gameswajiha.starblaster',
+      ),
     );
   }
 
