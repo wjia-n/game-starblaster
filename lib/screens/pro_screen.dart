@@ -31,7 +31,6 @@ class _ProScreenState extends State<ProScreen> {
   void initState() {
     super.initState();
     _store.lastThanks.addListener(_onThanks);
-    _store.proPurchased.addListener(_onPro);
     _store.purchaseError.addListener(_onError);
   }
 
@@ -49,15 +48,7 @@ class _ProScreenState extends State<ProScreen> {
     _store.lastThanks.value = null;
   }
 
-  void _onPro() {
-    if (_store.proPurchased.value && mounted) {
-      widget.settings.setPro(true);
-      _store.proPurchased.value = false;
-      widget.audio.win();
-      setState(() {});
-    }
-  }
-
+  
   void _onError() {
     final err = _store.purchaseError.value;
     if (err == null || !mounted) return;
@@ -73,7 +64,6 @@ class _ProScreenState extends State<ProScreen> {
   @override
   void dispose() {
     _store.lastThanks.removeListener(_onThanks);
-    _store.proPurchased.removeListener(_onPro);
     _store.purchaseError.removeListener(_onError);
     super.dispose();
   }

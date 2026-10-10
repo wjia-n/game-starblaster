@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-/// Real Play Billing store for Star Blaster: Pro unlock + tip jar.
+/// Real Play Billing tip jar for Star Blaster: Tip jar (all content is free and unlocked).
 ///
 /// Product IDs (Wajiha creates these in Play Console):
-/// - `starblasterpro` — one-time NON-CONSUMABLE: unlocks Pro forever.
 /// - `starblastercoffee` — CONSUMABLE tip.
 /// - `starblasterchocolate` — CONSUMABLE tip.
 ///
@@ -13,10 +12,10 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 /// service exposes [storeReady] = false and the UI shows an honest
 /// "available after store setup" state — never a fake buy button.
 class StarStore extends ChangeNotifier {
-  static const proId = 'starblasterpro';
   static const coffeeId = 'starblastercoffee';
   static const chocolateId = 'starblasterchocolate';
-  static const productIds = {proId, coffeeId, chocolateId};
+  static const productIds = {coffeeId, chocolateId};
+  ProductDetails? get proProduct => null; // Pro removed
 
   final InAppPurchase _iap = InAppPurchase.instance;
 
@@ -28,11 +27,10 @@ class StarStore extends ChangeNotifier {
   StreamSubscription<List<PurchaseDetails>>? _sub;
 
   final ValueNotifier<String?> lastThanks = ValueNotifier(null);
-  final ValueNotifier<bool> proPurchased = ValueNotifier(false);
+  final ValueNotifier<bool> proPurchased = ValueNotifier(true); // everything unlocked
   final ValueNotifier<bool> purchaseInProgress = ValueNotifier(false);
   final ValueNotifier<String?> purchaseError = ValueNotifier(null);
 
-  ProductDetails? get proProduct => _byId(proId);
   ProductDetails? get coffeeProduct => _byId(coffeeId);
   ProductDetails? get chocolateProduct => _byId(chocolateId);
 
@@ -77,10 +75,7 @@ class StarStore extends ChangeNotifier {
     for (final p in list) {
       if (p.status == PurchaseStatus.purchased ||
           p.status == PurchaseStatus.restored) {
-        if (p.productID == proId) {
-          proPurchased.value = true;
-          lastThanks.value = 'Welcome to Star Blaster PRO!';
-        } else if (p.productID == chocolateId) {
+        if (p.productID == chocolateId) {
           lastThanks.value = 'Thank you for the chocolate!';
         } else if (p.productID == coffeeId) {
           lastThanks.value = 'Thank you for the coffee!';
@@ -102,17 +97,9 @@ class StarStore extends ChangeNotifier {
     }
   }
 
+  
   Future<void> buyPro() async {
-    final p = proProduct;
-    if (p == null) return;
-    purchaseError.value = null;
-    purchaseInProgress.value = true;
-    try {
-      await _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: p));
-    } catch (_) {
-      purchaseInProgress.value = false;
-      purchaseError.value = 'Purchase failed — please try again.';
-    }
+    // Pro removed.
   }
 
   Future<void> buyTip(ProductDetails product) async {
@@ -142,7 +129,6 @@ class StarStore extends ChangeNotifier {
   Future<void> disposeStore() async {
     await _sub?.cancel();
     lastThanks.dispose();
-    proPurchased.dispose();
     purchaseInProgress.dispose();
     purchaseError.dispose();
   }

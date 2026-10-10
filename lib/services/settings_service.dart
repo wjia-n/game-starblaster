@@ -65,7 +65,7 @@ class StarSettings extends ChangeNotifier {
   int mode = 0; // campaign default
   int gamesPlayed = 0;
   int victories = 0;
-  bool isPro = false;
+  bool isPro = true; // everything unlocked — no Pro version
   bool reviewAsked = false;
 
   /// Best scores per mode key: cadet / pilot / ace / endless / attack.
@@ -148,7 +148,7 @@ class StarSettings extends ChangeNotifier {
     mode = (p.getInt(_kMode) ?? 0).clamp(0, 2);
     gamesPlayed = p.getInt(_kGames) ?? 0;
     victories = p.getInt(_kWins) ?? 0;
-    isPro = p.getBool(_kIsPro) ?? false;
+    isPro = true; // everything unlocked
     reviewAsked = p.getBool(_kReviewAsked) ?? false;
     for (final k in bestScores.keys.toList()) {
       bestScores[k] = p.getInt('$_kBestPrefix$k') ?? 0;
