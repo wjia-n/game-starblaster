@@ -254,7 +254,7 @@ class SpaceThemes {
     ),
     SpaceThemeDef(
       id: 'arctic_dawn',
-      name: 'Arctic Dawn',
+      name: 'Cosmic Dawn',
       bgDeep: Color(0xFF121820),
       bgMid: Color(0xFF1D2632),
       card: Color(0xFF283646),

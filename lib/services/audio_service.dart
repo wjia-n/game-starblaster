@@ -18,6 +18,9 @@ import 'package:audioplayers/audioplayers.dart';
 ///   resumes exactly where it left off instead of restarting or dying.
 /// - Every public method catches player errors; audio can never crash the app.
 class StarAudio {
+  /// Per-game pitch character (starblaster): 0.83x. Makes SFX unique.
+  static const double _pitchMul = 0.830;
+
   static const int _rate = 22050;
   final AudioPlayer _sfx = AudioPlayer();
   final AudioPlayer _music = AudioPlayer();
@@ -99,6 +102,8 @@ class StarAudio {
 
   List<double> _tone(double freq, double secs,
       {double freqEnd = 0, double attack = 0.02, double harmonics = 0.25}) {
+    freq *= _pitchMul;
+    freqEnd *= _pitchMul;
     final n = (_rate * secs).round();
     final out = List<double>.filled(n, 0);
     for (int i = 0; i < n; i++) {
@@ -170,42 +175,53 @@ class StarAudio {
       _cache.putIfAbsent(key, () => _wav(build()));
 
   Uint8List _menuBytes() => _clip('music_menu', () {
-        // Cinematic space pads: Cm – Ab – Eb – Bb, 16s loop.
-        final seq = [
-          [130.81, 155.56, 196.0], // Cm
-          [103.83, 130.81, 155.56], // Ab
-          [155.56, 196.0, 233.08], // Eb
-          [116.54, 146.83, 174.61], // Bb
-        ];
-        final out = <double>[];
-        for (final chord in seq) {
-          out.addAll(_padChord(chord, 4.0));
+        // D# bass + melody 0 – 2 – 5 – 4, 16s loop. Unique to starblaster.
+        final bassNotes = [77.78, 98.00, 130.81, 116.54];
+        final melNotes = [466.16, 587.34, 784.00, 698.46];
+        final out = List<double>.filled((_rate * 16).round(), 0);
+        final segLen = (_rate * 4).round();
+        for (int s = 0; s < 4; s++) {
+          final bass = _tone(bassNotes[s], 3.5, harmonics: 0.4);
+          final mel = _tone(melNotes[s], 1.2, harmonics: 0.25);
+          for (int i = 0; i < bass.length && s * segLen + i < out.length; i++) {
+            out[s * segLen + i] += bass[i] * 0.5;
+          }
+          final melStart = s * segLen + segLen ~/ 4;
+          for (int i = 0; i < mel.length && melStart + i < out.length; i++) {
+            out[melStart + i] += mel[i] * 0.35;
+          }
         }
         return out;
       });
 
+
   Uint8List _gameBytes() => _clip('music_game', () {
-        // Driving mission groove: pulsing bass + bright pluck melody, 12s.
-        final n = (_rate * 12).round();
-        final bass = [65.41, 65.41, 98.0, 65.41, 82.41, 82.41, 98.0, 73.42];
-        final out = List<double>.filled(n, 0.0);
-        for (int k = 0; k < bass.length; k++) {
-          final start = (n * k / bass.length).round();
-          final tone = _tone(bass[k], 0.9, harmonics: 0.4);
-          for (int i = 0; i < tone.length && start + i < n; i++) {
-            out[start + i] += tone[i] * 0.5;
-          }
-        }
-        final plucks = [523.25, 587.33, 659.25, 783.99, 659.25, 587.33];
-        for (int k = 0; k < plucks.length; k++) {
-          final start = (n * k / plucks.length).round();
-          final tone = _tone(plucks[k], 0.5, harmonics: 0.35);
-          for (int i = 0; i < tone.length && start + i < n; i++) {
-            out[start + i] += tone[i] * 0.28;
-          }
+        // D# waltz 0 – 2 – 5 – 4, 12s loop. Unique to starblaster.
+        final seq = [
+          [155.56, 196.00, 233.08],
+          [196.00, 233.08, 293.67],
+          [261.63, 311.13, 392.00],
+          [233.08, 293.67, 349.23]
+        ];
+        final out = <double>[];
+        for (final chord in seq) {
+          // Waltz: bass on 1, chords on 2 and 3
+          final bass = _tone(chord[0] / 2, 0.8, harmonics: 0.3);
+          final ch1 = _padChord([chord[1], chord[2]], 0.7);
+          final ch2 = _padChord([chord[1], chord[2]], 0.7);
+          out.addAll(bass);
+          final gap1 = List<double>.filled((_rate * 0.2).round(), 0);
+          out.addAll(gap1);
+          out.addAll(ch1);
+          final gap2 = List<double>.filled((_rate * 0.2).round(), 0);
+          out.addAll(gap2);
+          out.addAll(ch2);
+          final gap3 = List<double>.filled((_rate * 0.2).round(), 0);
+          out.addAll(gap3);
         }
         return out;
       });
+
 
   // ------------------------------------------------------------------ SFX
   Future<void> _play(Uint8List bytes) async {
