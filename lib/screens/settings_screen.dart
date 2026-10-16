@@ -3,6 +3,7 @@ import '../services/audio_service.dart';
 import '../services/settings_service.dart';
 import '../theme/space_themes.dart';
 import '../theme/space_ui.dart';
+import '../transfer/transfer_ui.dart';
 
 /// Settings: audio toggles + volume, pilot callsign, stats, credits.
 class SettingsScreen extends StatelessWidget {
@@ -40,6 +41,7 @@ class SettingsScreen extends StatelessWidget {
           builder: (_, _) => ListView(
             padding: const EdgeInsets.all(22),
             children: [
+              TransferSaveTile(gameSlug: 'starblaster'),
               SectionTitle('Audio', t),
               _ToggleRow(
                 label: 'Music',
