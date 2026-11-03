@@ -241,24 +241,4 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
-/// PRO lock badge.
-class ProBadge extends StatelessWidget {
-  const ProBadge({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: const Color(0xFFC9A227),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF7D6518), width: 1.5),
-      ),
-      child: const Text(
-        'PRO',
-        style: TextStyle(
-            fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white),
-      ),
-    );
-  }
-}

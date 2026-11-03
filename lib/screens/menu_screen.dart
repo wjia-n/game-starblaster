@@ -268,7 +268,6 @@ class _MenuScreenState extends State<MenuScreen> {
                       _MenuChip(
                         icon: Icons.brush,
                         label: 'Custom paint',
-                        locked: !_s.isPro,
                         onTap: () {
                           widget.audio.click();
                           Navigator.of(context).push(MaterialPageRoute(
@@ -450,10 +449,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 child: Column(
                   children: [
-                    if (i == 2 && !_s.isPro)
-                      const ProBadge()
-                    else
-                      Text(tiers[i].$1.name,
+                    Text(tiers[i].$1.name,
                           style: SpaceType.title(
                               15, t,
                               color: _s.difficulty == i
@@ -658,12 +654,10 @@ class _MenuChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final bool locked;
   const _MenuChip({
     required this.icon,
     required this.label,
     required this.onTap,
-    this.locked = false,
   });
 
   @override
@@ -688,10 +682,6 @@ class _MenuChip extends StatelessWidget {
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700)),
-            if (locked) ...[
-              const SizedBox(width: 6),
-              const ProBadge(),
-            ],
           ],
         ),
       ),
